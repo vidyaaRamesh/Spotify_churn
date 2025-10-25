@@ -58,13 +58,13 @@ with st.container():
         'gender': gender,
         'age': age,
         'country': country,
-        'subscription type': subscription_type,
-        'device type': device_type,
-        'listening time': listening_time,
-        'songs played per day': songs_played_per_day,
-        'skip rate': skip_rate,
-        'ads listened per week': ads_listened_per_week,
-        'offline listening': offline_listening,
+        'subscription_type': subscription_type,
+        'device_type': device_type,
+        'listening_time': listening_time,
+        'songs_played_per_day': songs_played_per_day,
+        'skip_rate': skip_rate,
+        'ads_listened_per_week': ads_listened_per_week,
+        'offline_listening': offline_listening,
     }
 
 # Convert input data to a DataFrame
