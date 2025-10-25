@@ -78,7 +78,7 @@ if st.button("Predict Churn"):
         # and raw numbers for numerical columns — just like during training.
 
         # Ensure numerical columns are float (optional safety)
-        numerical_cols = ['listening time', 'songs played per day', 'skip rate', 'ads listened per week']
+        numerical_cols = ['listening_time', 'songs_played_per_day', 'skip_rate', 'ads_listened_per_week']
         for col in numerical_cols:
             input_df[col] = pd.to_numeric(input_df[col], errors='coerce').fillna(0)
 
