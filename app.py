@@ -17,7 +17,7 @@ pd.set_option('future.no_silent_downcasting', True)
 
 # Load the model and preprocessor
 try:
-    model = tf.keras.models.load_model('best_ann_model.h5')
+    model = tf.keras.models.load_model('spotify_churn_best_ann_model.h5')
     with open('preprocessor.pkl', 'rb') as f:
         preprocessor = pickle.load(f)
 except Exception as e:
@@ -25,62 +25,46 @@ except Exception as e:
     st.stop()
 
 # Set up the Streamlit app
-st.set_page_config(page_title="Customer Churn Prediction", layout="centered")
-st.title("Customer Churn Prediction")
-st.markdown("Enter customer details to predict if they will churn.")
+st.set_page_config(page_title="Spotitify User Churn Prediction", layout="centered")
+st.title("Spotitify User Churn Prediction")
+st.markdown("Enter user details to predict if they will churn.")
 
 # Create input widgets for user data
 with st.container():
-    st.header("Customer Information")
-    age = st.slider("Age", 18, 90, 30)
-    gender = st.selectbox("Gender", ["Male", "Female"])
-    tenure = st.number_input("Tenure (months)", min_value=0, max_value=72, value=12)
-    has_phone_service = st.selectbox("Has Phone Service?", ["Yes", "No"])
-    multiple_lines = st.selectbox("Has Multiple Lines?", ["Yes", "No"])
-    has_internet_service = st.selectbox("Has Internet Service?", ["DSL", "Fiber optic", "No"])
-    online_security = st.selectbox("Online Security", ["Yes", "No", "No internet service"])
-    online_backup = st.selectbox("Online Backup", ["Yes", "No", "No internet service"])
-    device_protection = st.selectbox("Device Protection", ["Yes", "No", "No internet service"])
-    tech_support = st.selectbox("Tech Support", ["Yes", "No", "No internet service"])
-    streaming_tv = st.selectbox("Streaming TV", ["Yes", "No", "No internet service"])
-    streaming_movies = st.selectbox("Streaming Movies", ["Yes", "No", "No internet service"])
-    contract = st.selectbox("Contract Type", ["Month-to-month", "One year", "Two year"])
-    paperless_billing = st.selectbox("Paperless Billing", ["Yes", "No"])
-    payment_method = st.selectbox("Payment Method", ["Electronic check", "Mailed check", "Bank transfer (automatic)", "Credit card (automatic)"])
-    monthly_charges = st.number_input("Monthly Charges ($)", min_value=0.0, max_value=200.0, value=50.0)
-    total_charges = st.number_input("Total Charges ($)", min_value=0.0, value=float(monthly_charges * tenure))
+    st.header("User Information")
+    age = st.slider("Age", 10, 100, 30)
+    gender = st.selectbox("Gender", ['Female', 'Other', 'Male'])
+    country = st.selectbox("Country", ['CA', 'DE', 'AU', 'US', 'UK', 'IN', 'FR', 'PK'])
+    subscription_type = st.selectbox("Subscription Type", ['Free', 'Family', 'Premium', 'Student'])
+    device_type = st.selectbox("Device Type", ['Desktop', 'Web', 'Mobile'])
+    listening_time = st.number_input("Listening Time (hours)", min_value=0.0, value=0.0)
+    songs_played_per_day = st.number_input("Songs Played Per Day", min_value=0, value=0)
+    skip_rate = st.slider("Skip Rate (%)", 0, 100, 0)
+    ads_listened_per_week = st.number_input("Ads Listened Per Week", min_value=0, value=0)
+    offline_listening = st.selectbox("Offline Listening Enabled?", ["No", "Yes"])
 
-    # Auto-calculate minimum expected total charges
-    expected_min_total = monthly_charges * tenure
-    if total_charges < expected_min_total:
-        st.warning(f"💡 Total Charges seems low. Expected at least ${expected_min_total:.2f} for {tenure} months.")
+    # # Auto-calculate minimum expected total charges
+    # expected_min_total = monthly_charges * tenure
+    # if total_charges < expected_min_total:
+    #     st.warning(f"💡 Total Charges seems low. Expected at least ${expected_min_total:.2f} for {tenure} months.")
 
-    # Dynamic Senior Citizen based on age (65+)
-    senior_citizen = 1 if age >= 65 else 0
-    partner = st.selectbox("Has Partner?", ["No", "Yes"])
-    dependents = st.selectbox("Has Dependents?", ["No", "Yes"])
+    # # Dynamic Senior Citizen based on age (65+)
+    # senior_citizen = 1 if age >= 65 else 0
+    # partner = st.selectbox("Has Partner?", ["No", "Yes"])
+    # dependents = st.selectbox("Has Dependents?", ["No", "Yes"])
 
     # Create a dictionary from the user inputs — ALL VALUES AS STRINGS OR ORIGINAL TYPE
     input_data = {
         'gender': gender,
-        'SeniorCitizen': senior_citizen,  # This is numerical — will be scaled
-        'Partner': partner,
-        'Dependents': dependents,
-        'tenure': tenure,  # Numerical
-        'PhoneService': has_phone_service,
-        'MultipleLines': multiple_lines,
-        'InternetService': has_internet_service,
-        'OnlineSecurity': online_security,
-        'OnlineBackup': online_backup,
-        'DeviceProtection': device_protection,
-        'TechSupport': tech_support,
-        'StreamingTV': streaming_tv,
-        'StreamingMovies': streaming_movies,
-        'Contract': contract,
-        'PaperlessBilling': paperless_billing,
-        'PaymentMethod': payment_method,
-        'MonthlyCharges': monthly_charges,  # Numerical
-        'TotalCharges': total_charges,  # Numerical
+        'age': age,
+        'country': country,
+        'subscription type': subscription_type,
+        'device type': device_type,
+        'listening time': listening_time,
+        'songs played per day': songs_played_per_day,
+        'skip rate': skip_rate,
+        'ads listened per week': ads_listened_per_week,
+        'offline listening': offline_listening,
     }
 
 # Convert input data to a DataFrame
@@ -94,7 +78,7 @@ if st.button("Predict Churn"):
         # and raw numbers for numerical columns — just like during training.
 
         # Ensure numerical columns are float (optional safety)
-        numerical_cols = ['SeniorCitizen', 'tenure', 'MonthlyCharges', 'TotalCharges']
+        numerical_cols = ['listening time', 'songs played per day', 'skip rate', 'ads listened per week']
         for col in numerical_cols:
             input_df[col] = pd.to_numeric(input_df[col], errors='coerce').fillna(0)
 
