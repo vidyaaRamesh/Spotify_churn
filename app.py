@@ -39,9 +39,9 @@ with st.container():
     device_type = st.selectbox("Device Type", ['Desktop', 'Web', 'Mobile'])
     listening_time = st.number_input("Listening Time (hours)", min_value=0, value=0)
     songs_played_per_day = st.number_input("Songs Played Per Day", min_value=0, value=0)
-    skip_rate = st.slider("Skip Rate (%)", 0, 100, 0)
+    skip_rate = st.slider("Skip Rate", 0.0, 1.0, 0.0, step=0.01)
     ads_listened_per_week = st.number_input("Ads Listened Per Week", min_value=0, value=0)
-    offline_listening = st.selectbox("Offline Listening Enabled?", ["No", "Yes"])
+    offline_listening = st.selectbox("Offline Listening Enabled?", [0, 1], format_func=lambda x: "No" if x == 0 else "Yes")
 
     # # Auto-calculate minimum expected total charges
     # expected_min_total = monthly_charges * tenure
@@ -67,9 +67,6 @@ with st.container():
         'offline_listening': offline_listening,
     }
 
-# Convert input data to a DataFrame
-input_df = pd.DataFrame([input_data])
-
 # Button to make a prediction
 if st.button("Predict Churn"):
     try:
@@ -77,10 +74,11 @@ if st.button("Predict Churn"):
         # The preprocessor expects raw categories (strings) for categorical columns
         # and raw numbers for numerical columns — just like during training.
 
-        # Ensure numerical columns are float (optional safety)
-        numerical_cols = ['listening_time', 'songs_played_per_day', 'skip_rate', 'ads_listened_per_week']
-        for col in numerical_cols:
-            input_df[col] = pd.to_numeric(input_df[col], errors='coerce').fillna(0)
+        # Convert input data to DataFrame
+        input_df = pd.DataFrame([input_data])
+
+        # Apply log transformation to ads_listened_per_week (same as training)
+        input_df['ads_listened_per_week'] = input_df['ads_listened_per_week'].apply(lambda x: np.log1p(x))
 
         # ✅ Apply the preprocessor — it will OneHotEncode categorical and Scale numerical
         input_processed = preprocessor.transform(input_df)
