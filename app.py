@@ -37,7 +37,7 @@ with st.container():
     country = st.selectbox("Country", ['CA', 'DE', 'AU', 'US', 'UK', 'IN', 'FR', 'PK'])
     subscription_type = st.selectbox("Subscription Type", ['Free', 'Family', 'Premium', 'Student'])
     device_type = st.selectbox("Device Type", ['Desktop', 'Web', 'Mobile'])
-    listening_time = st.number_input("Listening Time (hours)", min_value=0.0, value=0.0)
+    listening_time = st.number_input("Listening Time (hours)", min_value=0, value=0)
     songs_played_per_day = st.number_input("Songs Played Per Day", min_value=0, value=0)
     skip_rate = st.slider("Skip Rate (%)", 0, 100, 0)
     ads_listened_per_week = st.number_input("Ads Listened Per Week", min_value=0, value=0)
